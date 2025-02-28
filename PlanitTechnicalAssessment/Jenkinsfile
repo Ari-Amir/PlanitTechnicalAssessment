@@ -24,7 +24,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: 'PlanitTechnicalAssessment/Reports',
+                reportDir: 'PlanitTechnicalAssessment/bin/Debug/net9.0/Reports',
                 reportFiles: 'TestReport_*.html',
                 reportName: 'Extent Report'
             ])
