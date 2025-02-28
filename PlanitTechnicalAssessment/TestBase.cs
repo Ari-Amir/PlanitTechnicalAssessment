@@ -23,18 +23,10 @@ public class TestBase : IDisposable
         contactPage = new ContactPage(page);
         shopPage = new ShopPage(page);
         cartPage = new CartPage(page, shopPage);
-
-        await context.Tracing.StartAsync(new TracingStartOptions
-        {
-            Screenshots = true,
-            Snapshots = true,
-            Sources = true
-        });
     }
 
     public void Dispose()
     {
-        context.Tracing.StopAsync(new TracingStopOptions { Path = $"trace-{DateTime.Now.Ticks}.zip" }).GetAwaiter().GetResult();
         browser?.CloseAsync();
     }
 }

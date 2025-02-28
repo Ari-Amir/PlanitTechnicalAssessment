@@ -1,4 +1,5 @@
 ﻿using Microsoft.Playwright;
+using Xunit;
 using static PlanitTechnicalAssessment.WaitUtils;
 
 namespace PlanitTechnicalAssessment.Pages
