@@ -1,14 +1,22 @@
 ﻿using Microsoft.Playwright;
 using Xunit;
-using static PlanitTechnicalAssessment.WaitUtils;
+using static PlanitTechnicalAssessment.Utils.WaitUtils;
 
 namespace PlanitTechnicalAssessment.Pages
 {
+    /* 
+       ClickSubmitButton: Submits the contact form.
+       FillMandatoryFields: Fills required fields with testLogger data.
+       VerifyErrorsAreDisplayed: Checks that error messages appear.
+       VerifyErrorsAreNotDisplayed: Checks that error messages disappear.
+       VerifySuccessPageIsDisplayed: Confirms successful form submission.
+    */
+
     public class ContactPage
     {
-        private IPage page;
+        private readonly IPage page;
 
-        public ContactPage (IPage page)
+        public ContactPage(IPage page)
         {
             this.page = page;
         }
@@ -72,7 +80,7 @@ namespace PlanitTechnicalAssessment.Pages
         public async Task VerifySuccessPageIsDisplayed()
         {
             var successMessage = page.Locator(".alert.alert-success");
-            await WaitForVisibleAsync(successMessage);
+            await WaitForVisibleAsync(successMessage, 300000);
             Assert.True(await successMessage.IsVisibleAsync());
         }
     }

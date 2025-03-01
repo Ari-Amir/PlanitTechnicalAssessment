@@ -1,12 +1,19 @@
 ﻿using Microsoft.Playwright;
 using Xunit;
+using static PlanitTechnicalAssessment.Utils.WaitUtils;
 
 namespace PlanitTechnicalAssessment.Pages
 {
+    /* 
+       ValidateCartSubtotals: Checks product subtotals match ShopPage data.
+       ValidateCartPrices: Verifies product prices match ShopPage data.
+       ValidateCartTotal: Ensures total equals sum of subtotals.
+    */
+
     public class CartPage
     {
-        private IPage page;
-        private ShopPage shopPage;
+        private readonly IPage page;
+        private readonly ShopPage shopPage;
 
         public CartPage(IPage page, ShopPage shopPage)
         {
@@ -18,10 +25,10 @@ namespace PlanitTechnicalAssessment.Pages
         {
             shopPage.productsPrices.TryGetValue(productName, out decimal shopPagePrice);
             shopPage.productsAmounts.TryGetValue(productName, out int shopPageAmount);
-            var shopPageSubtotal = (shopPagePrice * shopPageAmount);
+            var shopPageSubtotal = shopPagePrice * shopPageAmount;
 
             var subtotal = page.Locator($"tr.cart-item:has-text('{productName}') >> td.ng-binding:nth-child(4)");
-            await subtotal.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            await WaitForVisibleAsync(subtotal);
             var subtotalText = await subtotal.InnerTextAsync();
             var cleanedSubtotalText = subtotalText.Replace("$", "").Trim();
             decimal.TryParse(cleanedSubtotalText, out var cartPageSubtotal);
@@ -33,7 +40,7 @@ namespace PlanitTechnicalAssessment.Pages
             shopPage.productsPrices.TryGetValue(productName, out decimal shopPagePrice);
 
             var price = page.Locator($"tr.cart-item:has-text('{productName}') >> td.ng-binding:nth-child(2)");
-            await price.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            await WaitForVisibleAsync(price);
             var priceText = await price.InnerTextAsync();
             var cleanedPriceText = priceText.Replace("$", "").Trim();
             decimal.TryParse(cleanedPriceText, out var cartPagePrice);
@@ -43,11 +50,11 @@ namespace PlanitTechnicalAssessment.Pages
 
         public async Task ValidateCartTotal()
         {
-            var subtotals = page.Locator("td.ng-binding:nth-child(4)");
-            await subtotals.First.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            var subtotals = page.Locator("tr.cart-item >> td.ng-binding:nth-child(4)");
+            await WaitForVisibleAsync(subtotals.First);
             var allSubtotals = await subtotals.AllTextContentsAsync();
             decimal countedSubtotalsSum = 0;
-            
+
             foreach (var subtotalText in allSubtotals)
             {
                 var cleanedSubtotalText = subtotalText.Replace("$", "").Trim();
@@ -55,7 +62,7 @@ namespace PlanitTechnicalAssessment.Pages
                 countedSubtotalsSum += subtotal;
             }
             var total = page.Locator(".total.ng-binding");
-            await total.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            await WaitForVisibleAsync(total);
             var totalText = await total.InnerTextAsync();
             var cleanedTotalText = totalText.Replace("Total: ", "").Trim();
             decimal.TryParse(cleanedTotalText, out var displayedTotal);

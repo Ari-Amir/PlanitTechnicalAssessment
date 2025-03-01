@@ -14,4 +14,11 @@
     - Repository URL: `https://github.com/Ari-Amir/PlanitTechnicalAssessment.git`.  
     - Branch Specifier: `*/master`.  
     - Script Path: `PlanitTechnicalAssessment/Jenkinsfile`.
-    
+
+
+## Identified Bugs
+- **Invalid Email Accepted by Server**:
+  - Description: 
+    The form accepts an invalid email (e.g., `john@example,com`), even though it displays the error "Please enter a valid email". The server returns a success response.
+  - Expected Behavior: 
+    The server should reject the invalid email. Additionally, the frontend should block form submission when such an invalid email is entered.

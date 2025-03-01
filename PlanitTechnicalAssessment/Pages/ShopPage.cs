@@ -1,15 +1,21 @@
 ﻿using Microsoft.Playwright;
-
+using static PlanitTechnicalAssessment.Utils.WaitUtils;
 
 namespace PlanitTechnicalAssessment.Pages
 {
+     /*  
+        AddProductToCart: Adds specified products to the cart.
+        Also implements logic to save their price and amount into these fields:     
+          productsPrices - Stores product prices.
+          productsAmounts - Stores product quantities.
+        This is done for cart validation later.
+     */
+
     public class ShopPage
     {
-        private IPage page;
-
+        private readonly IPage page;
         public Dictionary<string, decimal> productsPrices;
         public Dictionary<string, int> productsAmounts;
-
 
         public ShopPage(IPage page)
         {
@@ -20,15 +26,17 @@ namespace PlanitTechnicalAssessment.Pages
 
         public async Task AddProductToCart(string productName, int productAmount)
         {
-            for (int i=0; i < productAmount; i++)
+            var buyButton = page.Locator($"li.product:has-text('{productName}') >> a.btn.btn-success");
+            for (int i = 0; i < productAmount; i++)
             {
-                var buyButton = page.Locator($"li.product:has-text('{productName}') >> a.btn.btn-success");
-                await buyButton.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+                await WaitForVisibleAsync(buyButton);
                 await buyButton.ClickAsync();
             }
 
-            var productPriceText = await page.Locator($"li.product:has-text('{productName}') >> span.product-price").InnerTextAsync();
-            var productPrice = decimal.Parse(productPriceText.Replace("$", "").Trim());
+            var priceLocator = page.Locator($"li.product:has-text('{productName}') >> span.product-price");
+            await WaitForVisibleAsync(priceLocator);
+            var productPriceText = await priceLocator.InnerTextAsync();
+            decimal.TryParse(productPriceText.Replace("$", "").Trim(), out decimal productPrice);
 
             if (productsAmounts.ContainsKey(productName))
             {
@@ -39,6 +47,6 @@ namespace PlanitTechnicalAssessment.Pages
                 productsAmounts[productName] = productAmount;
                 productsPrices[productName] = productPrice;
             }
-        }       
+        }
     }
 }

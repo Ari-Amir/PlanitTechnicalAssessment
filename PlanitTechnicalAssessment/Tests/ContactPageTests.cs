@@ -1,37 +1,49 @@
 ﻿using AventStack.ExtentReports;
 using PlanitTechnicalAssessment.Pages;
 using Xunit;
-using System.Threading.Tasks;
 
 namespace PlanitTechnicalAssessment.Tests
 {
-    [Collection("Sequential Tests")]
+    /* 
+       ValidateContactFormErrors: Tests error visibility and clearance on contact form.
+       ValidateSuccessfulContactFormSubmission: Tests successful form submission with 5 runs.
+       Uses ExtentReports logs for test reporting.
+    */
+
     public class ContactPageTests : TestBase
     {
-        private static ExtentReports _extent = ExtentReportManager.GetInstance();
-        private ExtentTest _test;
+        private static readonly ExtentReports reports = ExtentReportManager.GetInstance();
+        private ExtentTest testLogger;
 
         [Fact]
         public async Task ValidateContactFormErrors()
         {
-            _test = _extent.CreateTest("ValidateContactFormErrors");
-            _test.Log(Status.Info, "Test started");
+            testLogger = reports.CreateTest("ValidateContactFormErrors");
+            testLogger.Log(Status.Info, "Test started");
 
-            await LaunchBrowser();
-            await homePage.OpenContactPage();
+            try
+            {
+                await homePage.OpenContactPage();
+                testLogger.Log(Status.Info, "Clicking submit button with empty fields...");
+                await contactPage.ClickSubmitButton();
+                await contactPage.VerifyErrorsAreDisplayed();
 
-            _test.Log(Status.Info, "Clicking submit button with empty fields...");
-            await contactPage.ClickSubmitButton();
-            await contactPage.VerifyErrorsAreDisplayed();
+                testLogger.Log(Status.Info, "Filling mandatory fields and resubmitting...");
+                await contactPage.FillMandatoryFields();
+                await contactPage.ClickSubmitButton();
+                await contactPage.VerifyErrorsAreNotDisplayed();
 
-            _test.Log(Status.Info, "Filling mandatory fields and resubmitting...");
-            await contactPage.FillMandatoryFields();
-            await contactPage.ClickSubmitButton();
-            await contactPage.VerifyErrorsAreNotDisplayed();
-
-            _test.Log(Status.Pass, "Contact form validation passed");
-
-            _extent.Flush();
+                testLogger.Log(Status.Pass, "Contact form validation passed");
+            }
+            catch (Exception ex)
+            {
+                testLogger.Log(Status.Fail, $"Test failed: {ex.ToString()}");
+                throw;
+            }
+            finally
+            {
+                reports.Flush();
+            }             
         }
 
         [Theory]
@@ -42,20 +54,27 @@ namespace PlanitTechnicalAssessment.Tests
         [InlineData(5)]
         public async Task ValidateSuccessfulContactFormSubmission(int runNumber)
         {
-            _test = _extent.CreateTest($"ValidateSuccessfulContactFormSubmission - Run {runNumber}");
-            _test.Log(Status.Info, $"Running form submission test with set {runNumber}...");
+            testLogger = reports.CreateTest($"ValidateSuccessfulContactFormSubmission - Run {runNumber}");
+            testLogger.Log(Status.Info, $"Running form submission testLogger with set {runNumber}...");
 
-            await LaunchBrowser();
-            await homePage.OpenContactPage();
-
-            await contactPage.FillMandatoryFields();
-            await contactPage.ClickSubmitButton();
-            _test.Log(Status.Info, "Filling mandatory fields and resubmitting...");
-
-            await contactPage.VerifySuccessPageIsDisplayed();
-            _test.Log(Status.Pass, "Contact form successfully submitted");
-
-            _extent.Flush();
+            try
+            {
+                await homePage.OpenContactPage();
+                await contactPage.FillMandatoryFields();
+                await contactPage.ClickSubmitButton();
+                testLogger.Log(Status.Info, "Filling mandatory fields and resubmitting...");
+                await contactPage.VerifySuccessPageIsDisplayed();
+                testLogger.Log(Status.Pass, "Contact form successfully submitted");
+            }
+            catch (Exception ex)
+            {
+                testLogger.Log(Status.Fail, $"Test failed: {ex.ToString()}");
+                throw;
+            }
+            finally
+            {
+                reports.Flush();
+            }
         }
     }
 }

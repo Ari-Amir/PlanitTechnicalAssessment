@@ -2,9 +2,15 @@
 
 namespace PlanitTechnicalAssessment.Pages
 {
+    /* 
+       OpenContactPage: Navigates to the contact page.
+       OpenShopPage: Navigates to the shop page.
+       OpenCartPage: Navigates to the cart page.
+    */
+
     public class HomePage
     {
-        private IPage page;
+        private readonly IPage page;
 
         public HomePage(IPage page)
         {
@@ -27,4 +33,3 @@ namespace PlanitTechnicalAssessment.Pages
         }
     }
 }
-    
