@@ -1,15 +1,18 @@
 pipeline {
     agent any
+    environment {
+        DOTNET_CLI_HOME = "${WORKSPACE}"
+    }
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
+                bat 'dotnet --version'
             }
         }
         stage('Install Dependencies') {
             steps {
                 bat 'dotnet restore'
-                bat '"C:\\Users\\ASUS\\AppData\\Roaming\\npm\\playwright" install'
             }
         }
         stage('Run Tests') {
@@ -24,10 +27,16 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: 'PlanitTechnicalAssessment/bin/Debug/net9.0/Reports',
+                reportDir: "${WORKSPACE}/PlanitTechnicalAssessment/bin/Debug/net9.0/Reports",
                 reportFiles: 'TestReport_*.html',
                 reportName: 'Extent Report'
             ])
+        }
+        failure {
+            echo 'Pipeline failed! Check logs for details.'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
         }
     }
 }
